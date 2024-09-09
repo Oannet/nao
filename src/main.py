@@ -1,11 +1,11 @@
-from cifrados import descifrado_base64, leer_archivo_bytes, transformacion_suma
+import cifrados
 
 # Definir las rutas de los archivos
 archivos = ['files/file1.lol', 'files/file2.lol', 'files/file3.lol', 'files/file4.lol']
 
 # Procesar los archivos
 for archivo in archivos:
-    contenido = leer_archivo_bytes(archivo)
+    contenido = cifrados.leer_archivo_bytes(archivo)
     
     if not contenido:
         print(f"El archivo {archivo} está vacío o no se pudo leer correctamente.")
@@ -13,13 +13,18 @@ for archivo in archivos:
     
     print(f"Procesando el archivo: {archivo}")
     
-    # Probar con Base64
-    descifrado, metodo = descifrado_base64(contenido)
+    # Intentar descifrar con Base64
+    descifrado, metodo = cifrados.descifrado_base64(contenido)
     
-    # Aplicar transformaciones adicionales si no se logra descifrar con Base64
+    # Intentar transformación de suma de constante si Base64 falla
     if not descifrado:
-        descifrado, metodo = transformacion_suma(contenido)
+        descifrado, metodo = cifrados.transformacion_suma(contenido)
     
+    # Intentar Cifrado César si los métodos anteriores fallan
+    if not descifrado:
+        descifrado, metodo = cifrados.descifrado_cesar(contenido)
+    
+    # Guardar y reportar si se logró descifrar
     if descifrado:
         ruta_descifrado = archivo + '_descifrado'
         with open(ruta_descifrado, 'wb') as f:
